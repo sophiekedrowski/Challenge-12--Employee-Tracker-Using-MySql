@@ -10,40 +10,46 @@ function displayTeam() {
                 type: 'list',
                 message: 'What would you like to do?',
                 name: 'type',
-                choices: ['View all employees', 'Add employee', 'Update employee role', 'View all roles', 'Add role', 'View all departments', 'Add department'],
+                choices: ['View all employees', 'Add employee', 'Update employee role', 'View all roles', 'Add role', 'View all departments', 'Add department', 'All done'],
             }
         ]).then((data) => {
-            console.log(data)
-            // switch (data.type) {
-            //     case 'View all employees':
-            //         displayEmployee()
-            //         // console.log("kjhdfkjshdfkj")
-            //         break;
+            // console.log(data)
+            switch (data.type) {
+                case 'View all employees':
+                    displayEmployee() 
+                    console.log("\n")
+                    // console.log("kjhdfkjshdfkj")
+                    break;
 
-            //     case 'Add employee':
-            //         addEmployee()
-            //         break;
+                case 'Add employee':
+                    addEmployee()
+                    break;
 
-            //     case 'Update employee role':
-            //         //Figure this one out
-            //         break;
+                case 'Update employee role':
+                    //Figure this one out
+                    break;
 
-            //     case 'View all roles':
-            //         displayEmployeeRole()
-            //         break;
+                case 'View all roles':
+                    displayEmployeeRole()
+                    console.log("\n")
+                    break;
 
-            //     case 'Add role':
-            //         addRole()
-            //         break;
+                case 'Add role':
+                    addRole()
+                    break;
 
-            //     case 'View all departments':
-            //         displayDepartment()
-            //         break;
+                case 'View all departments':
+                    displayDepartment()
+                    console.log("\n")
+                    break;
 
-            //     case 'Add department':
-            //         addDepartment()
-            //         break;
-            // }
+                case 'Add department':
+                    addDepartment()
+                    break;
+                case 'All done':
+                    db.end();
+                    break;
+            }
 
         })
 }
@@ -68,6 +74,7 @@ function addDepartment() {
                     console.log(`Added ${department_name} to database`)
                     // connection.close()
                 }
+                displayTeam()
             })
         });
 }
@@ -106,6 +113,7 @@ function addEmployee() {
                 console.log(`Added  employee ${first_name} to database`)
                 // connection.close()
             }
+            displayTeam()
         })
     })
 }
@@ -135,12 +143,13 @@ function addRole() {
                 message: 'What is your department id?'
             }
         ]).then(function ({ id, title, salary, department_id }) {
-            connection.query(`INSERT INTO employee_role ( id, title, salary, department_id) VALUES (?,?)`, [099798676, 'eddsfadsfsdff', 8345895, 90], function (err, result) {
+            connection.query(`INSERT INTO employee_role ( id, title, salary, department_id) VALUES (?,?, ?, ?)`, [099798676, 'eddsfadsfsdff', 8345895, 90], function (err, result) {
                 if (err) throw err;
                 else {
                     console.log(`Added ${title} to database`)
                     // connection.close()
                 }
+                displayTeam()
             })
         });
 }
@@ -152,6 +161,7 @@ function displayEmployee() {
         else {
             console.table(employee)
         }
+        displayTeam()
     })
 }
 
@@ -161,6 +171,7 @@ function displayEmployeeRole() {
         else {
             console.table(employeeRole)
         }
+        displayTeam()
     })
 }
 
@@ -170,6 +181,7 @@ function displayDepartment() {
         else {
             console.table(department)
         }
+        displayTeam()
     })
 }
 

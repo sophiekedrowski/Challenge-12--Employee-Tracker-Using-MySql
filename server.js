@@ -22,4 +22,6 @@ const db = mysql.createConnection(
   console.log(`Connected to the employees_db database.`)
 );
 
+// db.end();
+
 module.exports = db;
