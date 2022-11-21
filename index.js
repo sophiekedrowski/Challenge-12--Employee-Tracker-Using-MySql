@@ -48,7 +48,7 @@ function displayTeam() {
                     addDepartment()
                     break;
                 case 'All done':
-                    db.end();
+                    connection.end();
                     break;
             }
 
