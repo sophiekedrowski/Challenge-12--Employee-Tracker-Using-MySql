@@ -16,7 +16,7 @@ function displayTeam() {
             // console.log(data)
             switch (data.type) {
                 case 'View all employees':
-                    displayEmployee() 
+                    displayEmployee()
                     console.log("\n")
                     // console.log("kjhdfkjshdfkj")
                     break;
@@ -59,16 +59,11 @@ function addDepartment() {
         [
             {
                 type: 'input',
-                name: 'id',
-                message: 'What is your department id?'
-            },
-            {
-                type: 'input',
                 name: 'department_name',
                 message: 'What is your department name?'
             }
-        ]).then(function ({ id, department_name }) {
-            connection.query(`INSERT INTO department (id, department_name) VALUES (?,?)`, [099798676, 'eddsfadsfsdff'], function (err, result) {
+        ]).then(function ({ department_name }) {
+            connection.query(`INSERT INTO department (department_name) VALUES (?)`, [department_name], function (err, result) {
                 if (err) throw err;
                 else {
                     console.log(`Added ${department_name} to database`)
@@ -83,11 +78,6 @@ function addEmployee() {
     inquirer.prompt([
         {
             type: 'input',
-            name: 'id',
-            message: 'What is your employee id?'
-        },
-        {
-            type: 'input',
             name: 'first name',
             message: 'What is your first name'
         },
@@ -95,19 +85,9 @@ function addEmployee() {
             type: 'input',
             name: 'last name',
             message: 'What is your last name?'
-        },
-        {
-            type: 'input',
-            name: 'role id',
-            message: 'What is your role id?'
-        },
-        {
-            type: 'input',
-            name: 'manager id',
-            message: 'What is your manager id, type null if not applicable?'
-        },
-    ]).then(function ({ id, first_name, last_name, role_id, manager_id }) {
-        connection.query(`INSERT INTO employee (id, first_name, last_name, role_id, manager_id) VALUES (?,?,?,?,?)`, [099798676, 'Abby', 'Nelsom', 890, 989], function (err, result) {
+        }
+    ]).then(function ({ first_name, last_name}) {
+        connection.query(`INSERT INTO employee (first_name, last_name) VALUES (?,?)`, [first_name, last_name], function (err, result) {
             if (err) throw err;
             else {
                 console.log(`Added  employee ${first_name} to database`)
@@ -124,11 +104,6 @@ function addRole() {
         [
             {
                 type: 'input',
-                name: 'id',
-                message: 'What is your id?'
-            },
-            {
-                type: 'input',
                 name: 'title',
                 message: 'What is your title?'
             },
@@ -136,17 +111,13 @@ function addRole() {
                 type: 'input',
                 name: 'salary',
                 message: 'What is your salary?'
-            },
-            {
-                type: 'input',
-                name: 'department_id',
-                message: 'What is your department id?'
             }
-        ]).then(function ({ id, title, salary, department_id }) {
-            connection.query(`INSERT INTO employee_role ( id, title, salary, department_id) VALUES (?,?, ?, ?)`, [099798676, 'eddsfadsfsdff', 8345895, 90], function (err, result) {
+        ]).then(function ({ title, salary}) {
+            connection.query(`INSERT INTO employee_role ( title, salary) VALUES (?,?)`, [title, salary], function (err, result) {
                 if (err) throw err;
                 else {
                     console.log(`Added ${title} to database`)
+                    console.log(id, title, salary, department_id)
                     // connection.close()
                 }
                 displayTeam()
@@ -154,6 +125,10 @@ function addRole() {
         });
 }
 
+
+// function updateRole(){
+
+// }
 
 function displayEmployee() {
     connection.query(`SELECT * FROM employees_db.employee`, function (err, employee) {
