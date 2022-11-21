@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
 const connection = require("./server");
+const { getRandomValues } = require('crypto');
 
 
 function displayTeam() {
@@ -78,15 +79,16 @@ function addEmployee() {
     inquirer.prompt([
         {
             type: 'input',
-            name: 'first name',
+            name: 'first_name',
             message: 'What is your first name'
         },
         {
             type: 'input',
-            name: 'last name',
+            name: 'last_name',
             message: 'What is your last name?'
         }
     ]).then(function ({ first_name, last_name}) {
+        console.log(first_name, last_name)
         connection.query(`INSERT INTO employee (first_name, last_name) VALUES (?,?)`, [first_name, last_name], function (err, result) {
             if (err) throw err;
             else {
@@ -100,6 +102,8 @@ function addEmployee() {
 
 
 function addRole() {
+
+    getRoles().then((err,roles)=>{
     inquirer.prompt(
         [
             {
@@ -111,8 +115,14 @@ function addRole() {
                 type: 'input',
                 name: 'salary',
                 message: 'What is your salary?'
+            },
+            {
+                type: 'list',
+                message: 'What role is this department part of?',
+                name: 'type',
+                choices: roles.map() // ["Serivce", "Enginerr"]
             }
-        ]).then(function ({ title, salary}) {
+        ]).then(function ({ title, salary, role_type}) {
             connection.query(`INSERT INTO employee_role ( title, salary) VALUES (?,?)`, [title, salary], function (err, result) {
                 if (err) throw err;
                 else {
@@ -123,6 +133,7 @@ function addRole() {
                 displayTeam()
             })
         });
+    })
 }
 
 
@@ -150,6 +161,10 @@ function displayEmployeeRole() {
     })
 }
 
+function getRoles() {
+    return connection.promise().query(`SELECT * FROM employees_db.employee_role`)
+}
+
 function displayDepartment() {
     connection.query(`SELECT * FROM employees_db.department`, function (err, department) {
         if (err) throw err;
@@ -162,3 +177,4 @@ function displayDepartment() {
 
 
 displayTeam();
+// getRoles();
