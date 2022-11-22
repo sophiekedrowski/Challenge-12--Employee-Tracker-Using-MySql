@@ -21,11 +21,11 @@ function displayTeam() {
                     break;
 
                 case 'Add employee':
-                    addEmployee()
+                    updateEmployeeExtended()
                     break;
 
                 case 'Update employee role':
-                    //Figure this one out
+                    updateRolesExtended()
                     break;
 
                 case 'View all roles':
@@ -34,7 +34,7 @@ function displayTeam() {
                     break;
 
                 case 'Add role':
-                    addRole()
+                    retrieveDepartment()
                     break;
 
                 case 'View all departments':
@@ -145,7 +145,7 @@ function addRole(departmentArray) {
 }
 
 
-function updateRole(rolesArray, employeeArray){
+function updateRole(rolesArray, employeeArray) {
     inquirer.prompt(
         [
             {
@@ -160,12 +160,12 @@ function updateRole(rolesArray, employeeArray){
                 message: 'What is their new role?',
                 choices: rolesArray,
             },
-        ]).then(function ({ employee, employee_newRole}) {
+        ]).then(function ({ employee, employee_newRole }) {
 
-            connection.query(`UPDATE employee SET role_id=? WHERE id=? `, [ employee_newRole, employee], function (err, result) {
+            connection.query(`UPDATE employee SET role_id=? WHERE id=? `, [employee_newRole, employee], function (err, result) {
                 if (err) throw err;
                 else {
-                    console.log(`Added ${employee} to database`)
+                    console.log("Added to database")
                 }
                 displayTeam()
             })
@@ -214,52 +214,81 @@ function getDepartments() {
     return connection.promise().query(`SELECT * FROM employees_db.department`)
 }
 
-// displayTeam();
-// getRoles();
+function retrieveDepartment(){
+getDepartments().then((data) => {
+    let departmentArray = []
 
-// getDepartments().then((data) => {
-//     let departmentArray = []
-
-//     for (let i = 0; i < data[0].length; i++) {
-
-//         const deptName = data[0][i].department_name
-//         const deptID = data[0][i].id
-
-//         departmentArray.push({name:deptName, value:deptID})
-//     }
-//     addRole(departmentArray)
-
-// }
-// )
-
-
-getRoles().then((data) => {
-    let rolesArray = []
     for (let i = 0; i < data[0].length; i++) {
-        
-        const roleName = data[0][i].title
-        const roleID = data[0][i].id
 
-        rolesArray.push({ name: roleName, value: roleID })
+        const deptName = data[0][i].department_name
+        const deptID = data[0][i].id
+
+        departmentArray.push({name:deptName, value:deptID})
     }
-    getEmployee().then((dataTwo) => {
+    addRole(departmentArray)
 
-        let managersArray = [{ name: "None", value: null }]
-        for (let i = 0; i < dataTwo[0].length; i++) {
+}
+)
+}
 
-            const managerFirst = dataTwo[0][i].first_name
-            const managerLast = dataTwo[0][i].last_name
 
-            const managerID = dataTwo[0][i].id
+function updateRolesExtended() {
+    getRoles().then((data) => {
+        let rolesArray = []
+        for (let i = 0; i < data[0].length; i++) {
 
-            rolesArray.push({ name: managerFirst + " " + managerLast, value: managerID })
+            const roleName = data[0][i].title
+            const roleID = data[0][i].id
+
+            rolesArray.push({ name: roleName, value: roleID })
         }
-        // addEmployee(rolesArray, managersArray)
-        // console.log(rolesArray)
-        updateRole(rolesArray, managersArray)
+        getEmployee().then((dataTwo) => {
+
+            let managersArray = []
+            for (let i = 0; i < dataTwo[0].length; i++) {
+
+                const managerFirst = dataTwo[0][i].first_name
+                const managerLast = dataTwo[0][i].last_name
+
+                const managerID = dataTwo[0][i].id
+
+                managersArray.push({ name: managerFirst + " " + managerLast, value: managerID })
+            }
+            updateRole(rolesArray, managersArray)
+        }
+        )
     }
     )
 }
-)
 
+function updateEmployeeExtended() {
+    getRoles().then((data) => {
+        let rolesArray = []
+        for (let i = 0; i < data[0].length; i++) {
 
+            const roleName = data[0][i].title
+            const roleID = data[0][i].id
+
+            rolesArray.push({ name: roleName, value: roleID })
+        }
+        getEmployee().then((dataTwo) => {
+
+            let managersArray = [{name:"None", value:null}]
+            for (let i = 0; i < dataTwo[0].length; i++) {
+
+                const managerFirst = dataTwo[0][i].first_name
+                const managerLast = dataTwo[0][i].last_name
+
+                const managerID = dataTwo[0][i].id
+
+                managersArray.push({ name: managerFirst + " " + managerLast, value: managerID })
+            }
+            addEmployee(rolesArray, managersArray)
+        }
+        )
+    }
+    )
+}
+
+displayTeam();
+// getRoles();
