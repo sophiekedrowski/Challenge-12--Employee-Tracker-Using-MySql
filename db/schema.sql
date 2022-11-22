@@ -29,21 +29,8 @@ CREATE TABLE employee (
   role_id INT NOT NULL,
   FOREIGN KEY (role_id) 
   REFERENCES employee_role(id),
-  manager_id INT NOT NULL REFERENCES employee
+  manager_id INT  REFERENCES employee
 );
-
-
-
--- Insert multiple produce items --
--- INSERT INTO produce (id, name)
--- VALUES
---     ( 1, "apple"),
---     ( 2, "orange"),
---     ( 3, "banana");
-
--- Insert row into produce table --
--- INSERT INTO produce (id, name)
---   VALUES (1, "apple");
 
 
 

@@ -1,7 +1,6 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
 const connection = require("./server");
-const { getRandomValues } = require('crypto');
 
 
 function displayTeam() {
@@ -19,7 +18,6 @@ function displayTeam() {
                 case 'View all employees':
                     displayEmployee()
                     console.log("\n")
-                    // console.log("kjhdfkjshdfkj")
                     break;
 
                 case 'Add employee':
@@ -68,14 +66,13 @@ function addDepartment() {
                 if (err) throw err;
                 else {
                     console.log(`Added ${department_name} to database`)
-                    // connection.close()
                 }
                 displayTeam()
             })
         });
 }
 
-function addEmployee() {
+function addEmployee(roles, employeeManager) {
     inquirer.prompt([
         {
             type: 'input',
@@ -86,14 +83,27 @@ function addEmployee() {
             type: 'input',
             name: 'last_name',
             message: 'What is your last name?'
-        }
-    ]).then(function ({ first_name, last_name}) {
+        },
+        {
+            type: 'list',
+            name: 'employee_role',
+            message: 'What is your employees role',
+            choices: roles
+        },
+        {
+            type: 'list',
+            name: 'employee_manager',
+            message: 'What is your employees manager',
+            choices: employeeManager
+        },
+
+
+    ]).then(function ({ first_name, last_name, employee_role, employee_manager }) {
         console.log(first_name, last_name)
-        connection.query(`INSERT INTO employee (first_name, last_name) VALUES (?,?)`, [first_name, last_name], function (err, result) {
+        connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?, ?, ?)`, [first_name, last_name, employee_role, employee_manager], function (err, result) {
             if (err) throw err;
             else {
                 console.log(`Added  employee ${first_name} to database`)
-                // connection.close()
             }
             displayTeam()
         })
@@ -101,9 +111,7 @@ function addEmployee() {
 }
 
 
-function addRole() {
-
-    getRoles().then((err,roles)=>{
+function addRole(departmentArray) {
     inquirer.prompt(
         [
             {
@@ -119,27 +127,50 @@ function addRole() {
             {
                 type: 'list',
                 message: 'What role is this department part of?',
-                name: 'type',
-                choices: roles.map() // ["Serivce", "Enginerr"]
+                name: 'department',
+                choices: departmentArray
             }
-        ]).then(function ({ title, salary, role_type}) {
-            connection.query(`INSERT INTO employee_role ( title, salary) VALUES (?,?)`, [title, salary], function (err, result) {
+        ]).then(function ({ title, salary, department }) {
+            console.log(department)
+
+            connection.query(`INSERT INTO employee_role ( title, salary, department_id) VALUES (?,?, ?)`, [title, salary, department], function (err, result) {
                 if (err) throw err;
                 else {
                     console.log(`Added ${title} to database`)
-                    console.log(id, title, salary, department_id)
-                    // connection.close()
                 }
                 displayTeam()
             })
         });
-    })
+
 }
 
 
-// function updateRole(){
+function updateRole(rolesArray, employeeArray){
+    inquirer.prompt(
+        [
+            {
+                type: 'list',
+                name: 'employee',
+                message: 'What employee would you like to update their role?',
+                choices: employeeArray,
+            },
+            {
+                type: 'list',
+                name: 'employee_newRole',
+                message: 'What is their new role?',
+                choices: rolesArray,
+            },
+        ]).then(function ({ employee, employee_newRole}) {
 
-// }
+            connection.query(`UPDATE employee SET role_id=? WHERE id=? `, [ employee_newRole, employee], function (err, result) {
+                if (err) throw err;
+                else {
+                    console.log(`Added ${employee} to database`)
+                }
+                displayTeam()
+            })
+        });
+}
 
 function displayEmployee() {
     connection.query(`SELECT * FROM employees_db.employee`, function (err, employee) {
@@ -175,6 +206,60 @@ function displayDepartment() {
     })
 }
 
+function getEmployee() {
+    return connection.promise().query(`SELECT * FROM employees_db.employee`)
+}
 
-displayTeam();
+function getDepartments() {
+    return connection.promise().query(`SELECT * FROM employees_db.department`)
+}
+
+// displayTeam();
 // getRoles();
+
+// getDepartments().then((data) => {
+//     let departmentArray = []
+
+//     for (let i = 0; i < data[0].length; i++) {
+
+//         const deptName = data[0][i].department_name
+//         const deptID = data[0][i].id
+
+//         departmentArray.push({name:deptName, value:deptID})
+//     }
+//     addRole(departmentArray)
+
+// }
+// )
+
+
+getRoles().then((data) => {
+    let rolesArray = []
+    for (let i = 0; i < data[0].length; i++) {
+        
+        const roleName = data[0][i].title
+        const roleID = data[0][i].id
+
+        rolesArray.push({ name: roleName, value: roleID })
+    }
+    getEmployee().then((dataTwo) => {
+
+        let managersArray = [{ name: "None", value: null }]
+        for (let i = 0; i < dataTwo[0].length; i++) {
+
+            const managerFirst = dataTwo[0][i].first_name
+            const managerLast = dataTwo[0][i].last_name
+
+            const managerID = dataTwo[0][i].id
+
+            rolesArray.push({ name: managerFirst + " " + managerLast, value: managerID })
+        }
+        // addEmployee(rolesArray, managersArray)
+        // console.log(rolesArray)
+        updateRole(rolesArray, managersArray)
+    }
+    )
+}
+)
+
+
